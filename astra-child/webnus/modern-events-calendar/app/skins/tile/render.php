@@ -1,8 +1,10 @@
 <?php
+
 /** no direct access **/
 defined('MECEXEC') or die();
 
 /** @var MEC_skin_tile $this */
+
 
 $styling = $this->main->get_styling();
 $event_colorskin = (isset($styling['mec_colorskin'] ) || isset($styling['color'])) ? 'colorskin-custom' : '';
@@ -91,6 +93,7 @@ $map_events = [];
                         $height = 200; // Default height
                     }
                 }
+                
                 $premiere_status = get_event_field_value($event, 16);
 
                 

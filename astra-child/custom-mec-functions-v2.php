@@ -40,39 +40,6 @@ function get_event_premiere_status($event) {
     }
 }
 
-function get_event_accessibility_features($event) {
-    $event_id = $event->ID;
-    $start_timestamp = (isset($event->date) && isset($event->date['start']) && isset($event->date['start']['timestamp'])) ? $event->date['start']['timestamp'] : null;
-
-    // Get mec_repeat_status
-    $mec_repeat_status = (isset($event->data) && isset($event->data->meta) && isset($event->data->meta['mec_repeat_status'])) ? $event->data->meta['mec_repeat_status'] : get_post_meta($event_id, 'mec_repeat_status', true);
-
-    if ($mec_repeat_status == 0) {
-        // Non-recurring event: Get accessibility features from post's metadata
-        $data_occurrences = get_post_meta($event_id, 'mec_fields', true);
-    } else {
-        // Recurring event: Get accessibility features from occurrences
-        $data_occurrences = (isset($event->data) && isset($event->data->meta) && isset($event->data->meta['mec_fields']) && is_array($event->data->meta['mec_fields'])) ? $event->data->meta['mec_fields'] : get_post_meta($event_id, 'mec_fields', true);
-
-        if ($start_timestamp) {
-            $data_occurrences = MEC_feature_occurrences::param($event_id, $start_timestamp, 'fields', $data_occurrences);
-        }
-    }
-    // echo whats in data_occurrences
-    echo '<pre>';
-    // also write the title of the event so i can debug
-    echo get_the_title($event_id);
-    print_r($data_occurrences);
-    echo '</pre>';
-
-    $accessibility_features = $data_occurrences[7] ?? null;
-
-    if (is_array($accessibility_features)) {
-        $accessibility_features = implode(', ', $accessibility_features);
-    }
-
-    return $accessibility_features;
-}
 
 function get_event_ticket_link($event) {
     $event_id = $event->ID;
@@ -557,7 +524,6 @@ function custom_mec_tickets_output($shortcode_id) {
 add_shortcode('custom_mec_shortcode_2733', function () {
     return custom_mec_archival_output(2733);
 });
-// end of debug shortcode
 
 add_shortcode('custom_mec_shortcode_2870', function() {
     return custom_mec_archival_output(2870);
@@ -571,8 +537,7 @@ add_shortcode('custom_mec_shortcode_3747', function() {
     return custom_mec_archival_output(3747);
 });
 
-// Add a new shortcode for the tickets page
-add_shortcode('custom_mec_tickets_shortcode', function() {
+add_shortcode('custom_mec_tickets_shortcode_2', function() {
     return custom_mec_tickets_output(3812); // Use the appropriate shortcode ID
 });
 
@@ -582,4 +547,3 @@ function enqueue_custom_fullcalendar_script() {
 add_action('wp_enqueue_scripts', 'enqueue_custom_fullcalendar_script');
 
 ?>
-
