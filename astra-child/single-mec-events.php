@@ -15,6 +15,12 @@ get_header('mec'); ?>
     <section id="<?php echo apply_filters('mec_single_page_html_id', 'main-content'); ?>" class="<?php echo apply_filters('mec_single_page_html_class', 'iszszi'); ?>" style="max-width: 1488px; margin-left: auto; margin-right: auto;">
         <div  class="custom-single-event-wrapper">
             <?php do_action('mec_before_main_content'); ?>
+            <?php
+            // Add Yoast Breadcrumbs here
+            if (function_exists('yoast_breadcrumb')) {
+                yoast_breadcrumb('<div class="breadcrumbs">', '</div>');
+            }
+            ?>
 
 
 

@@ -58,7 +58,86 @@ add_action('wp_enqueue_scripts', 'enqueue_custom_calendar_script');
 add_action('wp_enqueue_scripts', 'my_theme_enqueue_styles');
 
 // Include custom MEC functions
-require_once get_stylesheet_directory() . '/custom-mec-functions.php';
+require_once get_stylesheet_directory() . '/custom-mec-functions-v2.php';
 require_once get_stylesheet_directory() . '/komuna-shortcodes.php';
+
+function custom_yoast_breadcrumbs($links) {
+    if (is_singular('mec-events')) {
+        $post_id = get_the_ID();
+        $categories = wp_get_post_terms($post_id, 'mec_category');
+
+        if (!empty($categories) && !is_wp_error($categories)) {
+            $category = $categories[0];
+            
+            // Remove the default breadcrumb link for 'wydarzenia'
+            array_splice($links, 1, 1);
+
+            // Determine the correct path based on current language
+            $program_path = (pll_current_language() === 'en') ? 'programme' : 'program';
+            
+            $program_page = get_page_by_path($program_path);
+            if ($program_page) {
+                $links[] = array(
+                    'url' => get_permalink($program_page->ID),
+                    'text' => get_the_title($program_page->ID)
+                );
+            }
+
+            // Use the same language path for category
+            $category_page = get_page_by_path($program_path . '/' . $category->slug);
+            if ($category_page) {
+                $links[] = array(
+                    'url' => get_permalink($category_page->ID),
+                    'text' => get_the_title($category_page->ID)
+                );
+            }
+
+            // Add current event
+            $links[] = array(
+                'url' => get_permalink($post_id),
+                'text' => get_the_title($post_id)
+            );
+        }
+    }
+    return $links;
+}
+add_filter('wpseo_breadcrumb_links', 'custom_yoast_breadcrumbs');
+
+
+
+
+// function custom_mec_rewrite_rules() {
+//     // Get all categories
+//     $categories = get_terms(array(
+//         'taxonomy' => 'mec_category',
+//         'hide_empty' => false,
+//     ));
+
+//     if (!empty($categories) && !is_wp_error($categories)) {
+//         foreach ($categories as $category) {
+//             add_rewrite_rule(
+//                 '^program/' . $category->slug . '/wydarzenia/([^/]+)/?$',
+//                 'index.php?post_type=mec-events&name=$matches[1]',
+//                 'top'
+//             );
+//         }
+//     }
+// }
+// add_action('init', 'custom_mec_rewrite_rules');
+
+// function custom_mec_event_permalink($permalink, $post) {
+//     if ($post->post_type === 'mec-events') {
+//         $categories = wp_get_post_terms($post->ID, 'mec_category');
+        
+//         if (!empty($categories) && !is_wp_error($categories)) {
+//             $category = $categories[0];
+//             $permalink = str_replace('/wydarzenia/', '/program/' . $category->slug . '/wydarzenia/', $permalink);
+//         } else {
+//             error_log("Categories data not available for post ID: " . $post->ID);
+//         }
+//     }
+//     return $permalink;
+// }
+// add_filter('post_type_link', 'custom_mec_event_permalink', 10, 2);
 
 ?>
