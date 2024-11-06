@@ -219,7 +219,7 @@ function renderDeeperTicketsView($selected_event_id) {
     $single_event_main = $single->get_event_mec($selected_event_id);
     $single_event_obj = $single_event_main[0];
 
-    $events = MEC_main::get_shortcode_events(3827); // Replace OTHER_SHORTCODE_ID with the actual ID
+    $events = MEC_main::get_shortcode_events(3827); 
     // Initialize the output
     $output = '<div class="bilety-container bilety-container--deeper">';
 
@@ -241,16 +241,11 @@ function renderDeeperTicketsView($selected_event_id) {
                 if ($selected_event_id && $selected_event_id !== $event_id) {
                     continue;
                 }
-                // echo event variable
-                // echo '<pre>';
-                // print_r($event);
-                // echo '</pre>';
 
                 $event_title = isset($event->data->title) ? esc_html($event->data->title) : '';
                 $event_permalink = isset($event->data->post->guid) ? esc_url($event->data->post->guid) : '';
                 $event_start_date = isset($event->date['start']['date']) ? esc_html($event->date['start']['date']) : '';
                 $formatted_start_date = date('d.m.Y', strtotime($event_start_date));
-                // echo event variable
 
                 // $data = (isset($event->data) and isset($event->data->meta) and isset($event->data->meta['mec_fields']) and is_array($event->data->meta['mec_fields'])) ? $event->data->meta['mec_fields'] : get_post_meta($event->ID, 'mec_fields', true);
                 $mec_repeat_status = (isset($event->data->meta['mec_repeat_status'])) ? $event->data->meta['mec_repeat_status'] : null;
@@ -314,9 +309,7 @@ function renderDeeperTicketsView($selected_event_id) {
                     }
                     $output .= '</div>';
                 }
-                // $output .= '<h4 class="bilety-item-title"><a class="color-hover" data-event-id="' . $event_id . '" href="' . $event_permalink . '" target="_self" rel="noopener">' . $event_title . '</a></h4>';
 
-                // Display formatted dates
 
 
                 // Extract the start time from the event object
@@ -391,16 +384,7 @@ function renderDeeperTicketsView($selected_event_id) {
 
                 $output .= '</article>';
             }
-             // // Display custom fields
-                // if (!empty($event_fields)) {
-                //     $output .= '<div class="event-fields">';
-                //     $output .= '<p>';
-                //     foreach ($event_fields as $key => $value) {
-                //         $output .= esc_html($value) . " ";
-                //     }
-                //     $output .= '</p>';
-                //     $output .= '</div>';
-                // }
+
         }
     } else {
         // If no events are found, display a message
@@ -417,21 +401,14 @@ function renderTicketViewForSelectedEvent($selected_event_id) {
     $single_event_main = $single->get_event_mec($selected_event_id);
     $single_event_obj = $single_event_main[0];
 
-    // echo whats in single_event_obj
-    // echo '<pre>';
-    // print_r($single_event_obj);
-    // echo '</pre>';
+
     return;
-    // return $single_event_obj;
+
 }
 
 function custom_mec_tickets_output($shortcode_id) {
     // Fetch events for the given shortcode ID
     $events = MEC_main::get_shortcode_events($shortcode_id);
-
-    // For debugging: render everything in the events variable
-    // $output = '<pre>' . print_r($events, true) . '</pre>';
-    // return $output;
 
     // Check if the 'wybrane' parameter is present in the URL
     $selected_event_id = isset($_GET['wybrane']) ? $_GET['wybrane'] : null;
@@ -488,16 +465,7 @@ function custom_mec_tickets_output($shortcode_id) {
                 $output .= '<h4 class="bilety-item-title"><a class="color-hover" data-event-id="' . $event_id . '" href="' . $event_permalink . '" target="_self" rel="noopener">' . $event_title . '</a></h4>';
                 // event excerpt
                 $output .= '<p class="bilety-item-excerpt">' . $event_excerpt . '</p>';
-                // Display custom fields
-                // if (!empty($event_fields)) {
-                //     $output .= '<div class="event-fields">';
-                //     $output .= '<p>';
-                //     foreach ($event_fields as $key => $value) {
-                //         $output .= esc_html($value) . " ";
-                //     }
-                //     $output .= '</p>';
-                //     $output .= '</div>';
-                // }
+  
 
                 $output .= '</div>';
 
@@ -538,7 +506,7 @@ add_shortcode('custom_mec_shortcode_3747', function() {
 });
 
 add_shortcode('custom_mec_tickets_shortcode_2', function() {
-    return custom_mec_tickets_output(3812); // Use the appropriate shortcode ID
+    return custom_mec_tickets_output(3812);
 });
 
 function enqueue_custom_fullcalendar_script() {

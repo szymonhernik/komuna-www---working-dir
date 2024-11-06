@@ -12,14 +12,7 @@ function my_theme_enqueue_styles() {
     }
 }
 
-function enqueue_custom_calendar_script() {
-    wp_enqueue_script('custom-calendar', get_stylesheet_directory_uri() . '/js/custom-calendar.js', array('jquery'), null, true);
 
-    // Pass the REST URL to the JavaScript file
-    wp_localize_script('custom-calendar', 'mec_calendar', array(
-        'rest_url' => get_rest_url() . 'mec/v1/events'
-    ));
-}
 // register strings for translations:
     function register_my_strings() {
         if (function_exists('pll_register_string')) {
@@ -33,8 +26,7 @@ function enqueue_custom_calendar_script() {
             pll_register_string('buy-ticket', 'Kup bilet', 'astra-child');
             pll_register_string('location-label', 'Lokalizacja', 'astra-child');
             pll_register_string('accessibility-info', 'informacje o dostępności dla danego wydarzenia', 'astra-child');
-                    // From custom-mec-functions.php
-
+            // From custom-mec-functions.php
             pll_register_string('show', 'Pokaż', 'astra-child');
             pll_register_string('chronologically', 'CHRONOLOGICZNIE', 'astra-child');
             pll_register_string('alphabetically', 'ALFABETYCZNIE', 'astra-child');
@@ -47,11 +39,7 @@ function enqueue_custom_calendar_script() {
     }
     add_action('init', 'register_my_strings');
 
-// function load_child_theme_textdomain() {
-//     load_child_theme_textdomain('astra-child', get_stylesheet_directory() . '/languages');
-// }
 
-// add_action('after_setup_theme', 'load_child_theme_textdomain');
 
 add_action('wp_enqueue_scripts', 'enqueue_custom_calendar_script');
 
@@ -104,40 +92,5 @@ function custom_yoast_breadcrumbs($links) {
 add_filter('wpseo_breadcrumb_links', 'custom_yoast_breadcrumbs');
 
 
-
-
-// function custom_mec_rewrite_rules() {
-//     // Get all categories
-//     $categories = get_terms(array(
-//         'taxonomy' => 'mec_category',
-//         'hide_empty' => false,
-//     ));
-
-//     if (!empty($categories) && !is_wp_error($categories)) {
-//         foreach ($categories as $category) {
-//             add_rewrite_rule(
-//                 '^program/' . $category->slug . '/wydarzenia/([^/]+)/?$',
-//                 'index.php?post_type=mec-events&name=$matches[1]',
-//                 'top'
-//             );
-//         }
-//     }
-// }
-// add_action('init', 'custom_mec_rewrite_rules');
-
-// function custom_mec_event_permalink($permalink, $post) {
-//     if ($post->post_type === 'mec-events') {
-//         $categories = wp_get_post_terms($post->ID, 'mec_category');
-        
-//         if (!empty($categories) && !is_wp_error($categories)) {
-//             $category = $categories[0];
-//             $permalink = str_replace('/wydarzenia/', '/program/' . $category->slug . '/wydarzenia/', $permalink);
-//         } else {
-//             error_log("Categories data not available for post ID: " . $post->ID);
-//         }
-//     }
-//     return $permalink;
-// }
-// add_filter('post_type_link', 'custom_mec_event_permalink', 10, 2);
 
 ?>

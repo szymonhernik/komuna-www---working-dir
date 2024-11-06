@@ -113,20 +113,14 @@ $map_events = [];
                 // MEC Schema
                 do_action('mec_schema', $event);
                 ?>
-                <!-- echo $event->data  in html commented -->
-                <!-- <?php 
-                // echo '<pre style="background-color: #f5f5f5; padding: 10px; margin: 10px 0; overflow: auto; max-height: 400px;">';
-                // echo '<h4>Event Debug Information:</h4>';
-                // var_dump($event);
-                // echo '</pre>';
-                ?> -->
+     
 
                 
                     <article class="<?php echo ((isset($event->data->meta['event_past']) and trim($event->data->meta['event_past'])) ? 'mec-past-event' : ''); ?> calendar-item  <?php echo esc_attr($me_class); ?> mec-clear <?php echo esc_attr($this->get_event_classes($event)); ?> <?php echo esc_attr($custom_data_class); ?>">
                         <?php echo MEC_kses::element($this->get_label_captions($event)); ?>
                     
                         <?php if(isset($event->data->featured_image['tileview']) && trim($event->data->featured_image['tileview'])): ?>
-                            <!-- <div className="md:col-span-1"> -->
+
                             <!-- Image Column -->
                             <div class="calendar-item-image">
                                 <?php

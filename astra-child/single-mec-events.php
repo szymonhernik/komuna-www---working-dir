@@ -16,7 +16,7 @@ get_header('mec'); ?>
         <div  class="custom-single-event-wrapper">
             <?php do_action('mec_before_main_content'); ?>
             <?php
-            // Add Yoast Breadcrumbs here
+            // Add Yoast Breadcrumbs 
             if (function_exists('yoast_breadcrumb')) {
                 yoast_breadcrumb('<div class="breadcrumbs">', '</div>');
             }
@@ -138,13 +138,7 @@ get_header('mec'); ?>
             
             // Call the get_dates() function
             $dates = $occurrences->get_dates($event_id, $current_timestamp);
-            // echo '<!--';
-            // echo 'Post Metadata:';
-            // $post_meta = get_post_meta($event_id);
-            // foreach ($post_meta as $key => $value) {
-            //     echo "\n" . esc_html($key) . ': ' . esc_html(print_r($value, true));
-            // }
-            // echo '-->';
+
             // Display the list of occurrences
             if (!empty($dates)) {
                 echo '<div class="custom-box-container event-occurrences-container">';
@@ -278,7 +272,6 @@ get_header('mec'); ?>
                         echo '<span class="uppercase">' . esc_html(pll__('wyprzedane')) . '</span>';
                     }
                     echo '</div>';
-                    // TODO: if the event is free don't display the ticket link, just info that it's free
 
                     if ($location_id) {
                         $location = get_term($location_id, 'mec_location');
