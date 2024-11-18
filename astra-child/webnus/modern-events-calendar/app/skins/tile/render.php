@@ -74,23 +74,21 @@ $map_events = [];
                     if(trim($color) === '') $color = '#333333';
                 }
                 // if featured image is true and banner isnt empty
-                if($featured_image || empty($image)) $image = $event->data->featured_image['medium'] ?? '';
-                // if we use banner and not featured image i'll want to get the small res version of the banner.
+                if($featured_image || empty($image)) {
+                    // Try to get medium_large size first, with fallbacks
+                    $image = $event->data->featured_image['medium_large'] ?? $event->data->featured_image['large'] ?? $event->data->featured_image['medium'] ?? '';
+                }
+                // if we use banner and not featured image i'll want to get the larger version of the banner
                 if (!$featured_image && !empty($image)) {
                     $image_id = attachment_url_to_postid($image);
                     if ($image_id) {
-                        // If we found an attachment ID, use WordPress's medium size
-                        $image_array = wp_get_attachment_image_src($image_id, 'medium');
+                        // Use medium_large size for a balanced resolution
+                        $image_array = wp_get_attachment_image_src($image_id, 'medium_large');
                         if ($image_array) {
                             $image = $image_array[0];
                             $width = $image_array[1];
                             $height = $image_array[2];
                         }
-                    } else {
-                        // If we couldn't find an attachment ID, fall back to the original URL
-                        $image = $image;
-                        $width = 300;  // Default width
-                        $height = 200; // Default height
                     }
                 }
                 
@@ -119,23 +117,24 @@ $map_events = [];
                     <article class="<?php echo ((isset($event->data->meta['event_past']) and trim($event->data->meta['event_past'])) ? 'mec-past-event' : ''); ?> calendar-item  <?php echo esc_attr($me_class); ?> mec-clear <?php echo esc_attr($this->get_event_classes($event)); ?> <?php echo esc_attr($custom_data_class); ?>">
                         <?php echo MEC_kses::element($this->get_label_captions($event)); ?>
                     
-                        <?php if(isset($event->data->featured_image['tileview']) && trim($event->data->featured_image['tileview'])): ?>
-
+                        <div class="calendar-item-content">
                             <!-- Image Column -->
-                            <div class="calendar-item-image">
-                                <?php
-                                
-                                ?>
-                                <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($event->data->title); ?>" width="<?php echo esc_attr($width); ?>" height="<?php echo esc_attr($height); ?>">
-                            </div>
-                        <?php endif; ?>
-                        <!-- Title, Description, and Accessibility Column       -->
-                        <div class=" calendar-item-details">
+                            <?php if(isset($event->data->featured_image['tileview']) && trim($event->data->featured_image['tileview'])): ?>
+                                <div class="calendar-item-image">
+                                    <img src="<?php echo esc_url($image); ?>" 
+                                         alt="<?php echo esc_attr($event->data->title); ?>" 
+                                         width="<?php echo esc_attr($width); ?>" 
+                                         height="<?php echo esc_attr($height); ?>"
+                                         loading="lazy">
+                                </div>
+                            <?php endif; ?>
+                            <!-- Title, Description, and Accessibility Column -->
+                            <div class=" calendar-item-details">
                             <?php if ($premiere_status !== null && $premiere_status === 'tak') {
                                 // Show premiere badge or handle premiere status
                                 echo '<div class="premiere-badge">Premiera</div>';
                             } ?>
-                           
+
 
                             <h4 class="calendar-item-title">
                                 <a href="<?php echo esc_url($event->data->permalink); ?>"><?php echo esc_html($event->data->title); ?></a>
@@ -154,10 +153,10 @@ $map_events = [];
                             <?php if(!empty($location) && !empty($location['name'])): ?>
                                 <div class="calendar-item-location">
                                     <img src="<?php echo esc_url(home_url('/wp-content/uploads/2024/10/location.svg')); ?>" 
-                                         alt="" 
-                                         aria-hidden="true" 
-                                         width="21" 
-                                         height="20">
+                                        alt="" 
+                                        aria-hidden="true" 
+                                        width="21" 
+                                        height="20">
                                     <span class="visually-hidden">Lokalizacja: </span>
                                     <?php 
                                     $location_url = !empty($location['address']) ? 'https://maps.google.com/?q=' . urlencode($location['address']) : '';
@@ -171,12 +170,13 @@ $map_events = [];
                                     ?>
                                 </div>
                             <?php endif; ?>
-                              
-                             
+                            
+                            
                             <?php if (!empty($accessibility_features)): ?>
                                 <div class=" calendar-item-accessibility">+ <?php echo esc_html($accessibility_features); ?></div>
                             <?php endif; ?>
-                           
+
+                            </div>
                         </div>
                         <!-- Time and Ticket Link Column -->
                         <div class="column-time-and-ticket calendar-item-meta">
