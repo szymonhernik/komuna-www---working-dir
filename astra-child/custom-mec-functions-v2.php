@@ -488,6 +488,88 @@ function custom_mec_tickets_output($shortcode_id) {
     return $output;
 }
 
+function debug_mec_events($shortcode_id) {
+    $events = MEC_main::get_shortcode_events($shortcode_id);
+    return '<pre>' . print_r($events, true) . '</pre>';
+}
+
+function custom_mec_current_output($shortcode_id) {
+    $events = MEC_main::get_shortcode_events($shortcode_id);
+    
+    // Initialize the output
+    $output = '<div class="archive-events-container archive-events-container--current">';
+    $output .= '<div class="events-group">';
+
+    // Create an array to store unique events
+    $unique_events = [];
+    $seen_titles = [];
+
+    // Loop through all events
+    foreach ($events as $daily_events) {
+        foreach ($daily_events as $event) {
+            $title = $event->data->title;
+            
+            // Only add the event if we haven't seen this title before
+            if (!isset($seen_titles[$title])) {
+                $seen_titles[$title] = true;
+                $unique_events[] = $event;
+            }
+        }
+    }
+
+    // Render each unique event
+    foreach ($unique_events as $event) {
+        // Extract event details
+        $event_excerpt = isset($event->data->post->post_excerpt) ? esc_html($event->data->post->post_excerpt) : '';
+        $event_title = isset($event->data->title) ? esc_html($event->data->title) : '';
+        $event_permalink = isset($event->data->post->guid) ? esc_url($event->data->post->guid) : '';
+        $event_thumbnail = isset($event->data->featured_image['large']) ? esc_url($event->data->featured_image['large']) : '';
+        
+        // Get start and end dates
+        $start_date = isset($event->data->meta['mec_start_date']) ? $event->data->meta['mec_start_date'] : '';
+        $end_date = isset($event->data->meta['mec_end_date']) ? $event->data->meta['mec_end_date'] : '';
+        
+        // Format dates
+        $formatted_start_date = date('d.m.Y', strtotime($start_date));
+        $formatted_end_date = date('d.m.Y', strtotime($end_date));
+        
+        // Render each event as an article element
+        $output .= '<article class="event-item" itemscope="">';
+        $output .= '<a class="event-link" href="' . $event_permalink . '" target="_self" rel="noopener">';
+        
+        // Event image
+        $output .= '<div class="event-image">';
+        if ($event_thumbnail) {
+            $output .= '<img class="event-thumbnail" src="' . $event_thumbnail . '" alt="' . $event_title . '">';
+        }
+        $output .= '</div>';
+        
+        // Event content
+        $output .= '<div class="event-details">';
+        $output .= '<h3 class="event-title">' . $event_title . '</h3>';
+        
+        // Date range
+        $output .= '<div class="event-date-range">';
+        $output .= '<span class="event-dates">' . $formatted_start_date;
+        if ($start_date !== $end_date) {
+            $output .= ' - ' . $formatted_end_date;
+        }
+        $output .= '</span>';
+        $output .= '</div>';
+        
+        $output .= '<p class="event-excerpt">' . $event_excerpt . '</p>';
+        $output .= '</div>';
+        
+        $output .= '</a>'; // Close the event link
+        $output .= '</article>';
+    }
+
+    $output .= '</div>'; // Close events-group
+    $output .= '</div>'; // Close archive-events-container
+
+    return $output;
+}
+
 
 add_shortcode('custom_mec_shortcode_2733', function () {
     return custom_mec_archival_output(2733);
@@ -503,6 +585,12 @@ add_shortcode('custom_mec_shortcode_2742', function() {
 
 add_shortcode('custom_mec_shortcode_3747', function() {
     return custom_mec_archival_output(3747);
+});
+
+// 3745
+add_shortcode('debug_mec_events_3745', function() {
+    // return debug_mec_events(3745);
+    return custom_mec_current_output(3745);
 });
 
 add_shortcode('custom_mec_tickets_shortcode_2', function() {

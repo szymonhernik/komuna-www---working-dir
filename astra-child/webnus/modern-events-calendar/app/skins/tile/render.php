@@ -14,6 +14,67 @@ $reason_for_cancellation = isset($this->skin_options['reason_for_cancellation'])
 $method = isset($this->skin_options['sed_method']) ? $this->skin_options['sed_method'] : false;
 $map_events = [];
 
+// Helper function to format date with day name
+function format_date_with_day($timestamp) {
+    $formatted_date = date_i18n('d.m', $timestamp);
+    $day_of_week = date_i18n('l', $timestamp);
+    return $formatted_date . ' <span class="mec-day-name">' . $day_of_week . '</span>';
+}
+
+// Handle multi-day non-repeating event
+function handle_multiday_event($event, &$grouped_events) {
+    $start_date = $event->data->meta['mec_date']['start']['date'];
+    $end_date = $event->data->meta['mec_date']['end']['date'];
+    
+    $period = new DatePeriod(
+        new DateTime($start_date),
+        new DateInterval('P1D'),
+        (new DateTime($end_date))->modify('+1 day')
+    );
+    
+    foreach ($period as $date_obj) {
+        $current_date = $date_obj->format('Y-m-d');
+        $formatted_date_with_day = format_date_with_day(strtotime($current_date));
+        
+        if (!isset($grouped_events[$formatted_date_with_day])) {
+            $grouped_events[$formatted_date_with_day] = array();
+        }
+        $grouped_events[$formatted_date_with_day][] = $event;
+    }
+}
+
+// Handle single day event
+function handle_single_day_event($event, $date, &$grouped_events) {
+    $date_timestamp = strtotime($date);
+    $formatted_date_with_day = format_date_with_day($date_timestamp);
+    
+    if (!isset($grouped_events[$formatted_date_with_day])) {
+        $grouped_events[$formatted_date_with_day] = array();
+    }
+    $grouped_events[$formatted_date_with_day][] = $event;
+}
+
+// Main grouping logic
+$grouped_events = array();
+foreach($this->events as $date => $events):
+    foreach($events as $event):
+        $repeat_status = isset($event->data->meta['mec_repeat_status']) ? $event->data->meta['mec_repeat_status'] : 0;
+        
+        if ($repeat_status == 0) {
+            $start_date = $event->data->meta['mec_date']['start']['date'];
+            $end_date = $event->data->meta['mec_date']['end']['date'];
+            
+            if ($start_date !== $end_date) {
+                handle_multiday_event($event, $grouped_events);
+            } else {
+                handle_single_day_event($event, $date, $grouped_events);
+            }
+        } else {
+            handle_single_day_event($event, $date, $grouped_events);
+        }
+    endforeach;
+endforeach;
+
 ?>
 
 
@@ -27,15 +88,14 @@ $map_events = [];
         if($count == 0 or $count == 5) $col = 4;
         else $col = 12 / $count;
 
-        // Group events by date
-        $grouped_events = array();
-        foreach($this->events as $date => $events):
-            $date_timestamp = strtotime($date);
-            $formatted_date = date_i18n('d.m', $date_timestamp);
-            $day_of_week = date_i18n('l', $date_timestamp); // Get the full name of the day
-            $formatted_date_with_day = $formatted_date . ' <span class="mec-day-name">' . $day_of_week . '</span>';
-            $grouped_events[$formatted_date_with_day] = $events;
-        endforeach;
+        // debug events 
+        // echo '<pre>';
+        // var_dump($this->events);
+        // echo '</pre>';
+
+        // [mec_repeat_status] is 0 or 1
+        // 0 means the event is not repeated
+        // 1 means the event is repeated
 
         foreach($grouped_events as $formatted_date_with_day => $events):
             ?>
