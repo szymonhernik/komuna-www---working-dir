@@ -14,22 +14,7 @@ $reason_for_cancellation = isset($this->skin_options['reason_for_cancellation'])
 $method = isset($this->skin_options['sed_method']) ? $this->skin_options['sed_method'] : false;
 $map_events = [];
 
-function get_event_field_value_global($event, $field_number) {
-    global $map_events;
-    
-    // Store the first occurrence of each event ID
-    if (!isset($map_events[$event->data->ID])) {
-        $map_events[$event->data->ID] = $event;
-    }
-    
-    $first_occurrence = $map_events[$event->data->ID];
-    
-    // Check for edited occurrences for the current event's specific date
-    $current_date = $event->date['start']['date'];
-    return $first_occurrence->data->edited_occurrences[$current_date]['fields'][$field_number] ?? 
-           $first_occurrence->data->meta['mec_fields'][$field_number] ?? 
-           '';
-}
+
 
 
 // New helper functions at the top of the file
@@ -162,29 +147,14 @@ function get_event_banner_image($event, $banner) {
                 // $tickets_available_value = get_event_field_value($event, 12);
                 // $tickets_soldout = $tickets_available_value === 'wyprzedane' ? 'wyprzedane' : 'dostępne';
                 
-               // Replace the tickets availability check with this (around line 150)
-               // Then you can use it like this:
-                $tickets_available_value = get_event_field_value_global($event, 12);
+                $mec_repeat_status =  $event->data->meta['mec_repeat_status'];
+                // tickets_available_value 
+                $tickets_available_value = $mec_repeat_status == 0 ? $event->data->meta['mec_fields'][12] : $event->data->edited_occurrences[$event_start_date]['fields'][12];
                 $tickets_soldout = $tickets_available_value === 'wyprzedane' ? 'wyprzedane' : 'dostępne';
-
-                // is event free 
-                $is_event_free = get_event_field_value_global($event, 17);
-
-                // ticket div button element
-                // if event is free show "wstęp wolny" (no link)
-                // if event is not free and tickets are not sold out show "bilety" (it should be a link to bilety page)
-                // if event is not free and tickets are sold out show "wyprzedane" (no link)
-                // ticket html element
-                $ticket_html = '';
-                if($is_event_free === 'tak') {
-                    $ticket_html = '<span class="free-entry">wstęp wolny</span>';
-                }
-                else if($tickets_soldout === 'dostępne') {
-                    $ticket_html = '<a href="' . esc_url(home_url('/bilety')) . '" class="buy-ticket-button calendar-item-ticket">bilety</a>';
-                }
-                else if($tickets_soldout === 'wyprzedane') {
-                    $ticket_html = '<span class="sold-out">wyprzedane</span>';
-                }
+                // debug tickets soldout
+                echo '<pre>';
+                var_dump($event->data->edited_occurrences);
+                echo '</pre>';
                 
                 
                 $mec_data = $this->display_custom_data($event);
@@ -218,27 +188,17 @@ function get_event_banner_image($event, $banner) {
                     }
                 }
                 
-                $premiere_status = get_event_field_value_global($event, 16);
+                $premiere_status = get_event_field_value($event, 16);
 
                 
-                // premiere status debug
-                // echo '<pre>';
-                // var_dump($premiere_status);
-                // echo '</pre>';
-
+          
 
                 
                 $custom_data_class = !empty($mec_data) ? 'mec-custom-data' : '';
-                // accessibility features
-                // $accessibility_features = get_event_field_value($event, 7);
-                $accessibility_features = get_event_field_value_global($event, 7);
+                $accessibility_features = get_event_field_value($event, 7);
                 if (is_array($accessibility_features)) {
                     $accessibility_features = implode(', ', $accessibility_features);
                 }
-                // debug accessibility features
-                // echo '<pre>';
-                // var_dump($accessibility_features);
-                // echo '</pre>';
           
                 
                 // MEC Schema
@@ -290,7 +250,7 @@ function get_event_banner_image($event, $banner) {
                             <!-- this will have to be changed -->
                             <?php echo $display_time; ?>
                             </div>
-                            <?php echo $ticket_html; ?>
+                            <a href="<?php echo esc_url(home_url('/bilety/?wybrane=' . $event->data->ID)); ?>" class="buy-ticket-button calendar-item-ticket">Bilety</a>
                         </div>
                     </article>
                

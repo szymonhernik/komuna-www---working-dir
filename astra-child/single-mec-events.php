@@ -105,11 +105,7 @@ get_header('mec'); ?>
             <div class="custom-box-container extra-info-container">
                 <?php
                 $start_date = get_post_meta(get_the_ID(), 'mec_start_date', true);
-                $is_teatr_taniec = has_term(array('teatr-taniec', 'theater-dance'), 'mec_category');
-
-                if (!empty($start_date) && $is_teatr_taniec) {
-                    echo '<span class="event-year">' . esc_html(pll__('Data premiery')) . ': ' . date('d.m.Y', strtotime($start_date)) . '</span>';
-                }
+            
                 
                 $is_free = get_post_meta(get_the_ID(), 'mec_fields_17', true);
 
