@@ -20,7 +20,7 @@ function my_theme_enqueue_styles() {
             pll_register_string('premiere-date', 'Data premiery', 'astra-child');
             pll_register_string('duration', 'Czas trwania', 'astra-child');
             pll_register_string('tickets', 'Bilety', 'astra-child');
-            pll_register_string('trigger-warnings', 'Ostrzegacze', 'astra-child');
+            pll_register_string('trigger-warnings', 'Ważne', 'astra-child');
             pll_register_string('premiere', 'premiera', 'astra-child');
             pll_register_string('sold-out', 'wyprzedane', 'astra-child');
             pll_register_string('buy-ticket', 'Kup bilet', 'astra-child');

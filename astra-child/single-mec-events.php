@@ -105,8 +105,9 @@ get_header('mec'); ?>
             <div class="custom-box-container extra-info-container">
                 <?php
                 $start_date = get_post_meta(get_the_ID(), 'mec_start_date', true);
+                $is_teatr_taniec = has_term(array('teatr-taniec', 'theater-dance'), 'mec_category');
 
-                if (!empty($start_date)) {
+                if (!empty($start_date) && $is_teatr_taniec) {
                     echo '<span class="event-year">' . esc_html(pll__('Data premiery')) . ': ' . date('d.m.Y', strtotime($start_date)) . '</span>';
                 }
                 
@@ -124,7 +125,7 @@ get_header('mec'); ?>
                     
                     $triggerWarning = get_post_meta(get_the_ID(), 'mec_fields_13', true);
                     if (!empty($triggerWarning)) {
-                        echo '<p class="event-trigger-warning">' . esc_html(pll__('Ostrzegacze')) . ': ' . esc_html($triggerWarning) . '</p>';
+                        echo '<p class="event-trigger-warning">' . esc_html(pll__('Ważne')) . ': ' . esc_html($triggerWarning) . '</p>';
                     }
                 echo '</div>';
                 ?>
@@ -142,7 +143,7 @@ get_header('mec'); ?>
             // Display the list of occurrences
             if (!empty($dates)) {
                 echo '<div class="custom-box-container event-occurrences-container">';
-                echo '<h2 class="event-occurrences-title">' . esc_html(pll__('Planowane wydarzenia')) . '</h2>';             
+                // echo '<h2 class="event-occurrences-title">' . esc_html(pll__('Planowane wydarzenia')) . '</h2>';             
                 echo '<ul class="event-occurrences-list">';
                 foreach ($dates as $date) {
                     $start_timestamp = $date->tstart;

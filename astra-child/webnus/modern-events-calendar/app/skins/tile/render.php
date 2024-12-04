@@ -14,6 +14,76 @@ $reason_for_cancellation = isset($this->skin_options['reason_for_cancellation'])
 $method = isset($this->skin_options['sed_method']) ? $this->skin_options['sed_method'] : false;
 $map_events = [];
 
+// New helper functions at the top of the file
+function group_events_by_date($events) {
+    $groupedEvents = array();
+    foreach($events as $date => $events) {
+        $dateTimestamp = strtotime($date);
+        $formattedDate = date_i18n('d.m', $dateTimestamp);
+        $dayOfWeek = date_i18n('l', $dateTimestamp);
+        $formattedDateWithDay = $formattedDate . ' <span class="mec-day-name">' . $dayOfWeek . '</span>';
+        $groupedEvents[$formattedDateWithDay] = $events;
+    }
+    return $groupedEvents;
+}
+
+function render_event_image($event, $image, $width = '', $height = '') {
+    if(isset($event->data->featured_image['tileview']) && trim($event->data->featured_image['tileview'])): ?>
+        <div class="calendar-item-image">
+            <img src="<?php echo esc_url($image); ?>" 
+                 alt="<?php echo esc_attr($event->data->title); ?>" 
+                 width="<?php echo esc_attr($width); ?>" 
+                 height="<?php echo esc_attr($height); ?>"
+                 loading="lazy">
+        </div>
+    <?php endif;
+}
+
+function render_event_location($location) {
+    if(!empty($location) && !empty($location['name'])): ?>
+        <div class="calendar-item-location">
+            <img src="<?php echo esc_url(home_url('/wp-content/uploads/2024/10/location.svg')); ?>" 
+                alt="" 
+                aria-hidden="true" 
+                width="21" 
+                height="20">
+            <span class="visually-hidden">Lokalizacja: </span>
+            <?php 
+            $locationUrl = !empty($location['address']) ? 'https://maps.google.com/?q=' . urlencode($location['address']) : '';
+            if (!empty($locationUrl)) {
+                echo '<a href="' . esc_url($locationUrl) . '" target="_blank" rel="noopener noreferrer">';
+                echo '<span>' . esc_html($location['name']) . '</span>';
+                echo '</a>';
+            } 
+            echo '<span>' . esc_html($location['name']) . '</span>';
+            
+            ?>
+        </div>
+    <?php endif;
+}
+
+function get_event_banner_image($event, $banner) {
+    $image = $banner['image'] ?? '';
+    $featuredImage = $banner['use_featured_image'] ?? 0;
+    
+    if($featuredImage || empty($image)) {
+        return $event->data->featured_image['medium_large'] ?? 
+               $event->data->featured_image['large'] ?? 
+               $event->data->featured_image['medium'] ?? '';
+    }
+    
+    if (!$featuredImage && !empty($image)) {
+        $imageId = attachment_url_to_postid($image);
+        if ($imageId) {
+            $imageArray = wp_get_attachment_image_src($imageId, 'medium_large');
+            return $imageArray ? $imageArray[0] : $image;
+        }
+    }
+    
+    return $image;
+}
+
+// Main render code
 ?>
 
 
@@ -32,16 +102,8 @@ $map_events = [];
         // var_dump($this->events);
         // echo '</pre>';
 
-        // Group events by date
-        $grouped_events = array();
-        foreach($this->events as $date => $events):
-            $date_timestamp = strtotime($date);
-            $formatted_date = date_i18n('d.m', $date_timestamp);
-            $day_of_week = date_i18n('l', $date_timestamp); // Get the full name of the day
-            $formatted_date_with_day = $formatted_date . ' <span class="mec-day-name">' . $day_of_week . '</span>';
-            $grouped_events[$formatted_date_with_day] = $events;
-        endforeach;
-
+        $grouped_events = group_events_by_date($this->events);
+        
         foreach($grouped_events as $formatted_date_with_day => $events):
             ?>
             <h3 class="custom-date-header"><?php echo wp_kses_post($formatted_date_with_day); ?></h3>
@@ -127,15 +189,7 @@ $map_events = [];
                     
                         <div class="calendar-item-content">
                             <!-- Image Column -->
-                            <?php if(isset($event->data->featured_image['tileview']) && trim($event->data->featured_image['tileview'])): ?>
-                                <div class="calendar-item-image">
-                                    <img src="<?php echo esc_url($image); ?>" 
-                                         alt="<?php echo esc_attr($event->data->title); ?>" 
-                                         width="<?php echo esc_attr($width); ?>" 
-                                         height="<?php echo esc_attr($height); ?>"
-                                         loading="lazy">
-                                </div>
-                            <?php endif; ?>
+                            <?php render_event_image($event, get_event_banner_image($event, $banner), $width, $height); ?>
                             <!-- Title, Description, and Accessibility Column -->
                             <div class=" calendar-item-details">
                             <?php if ($premiere_status !== null && $premiere_status === 'tak') {
@@ -158,26 +212,7 @@ $map_events = [];
                             }
                             ?>
                             <!-- Locations -->
-                            <?php if(!empty($location) && !empty($location['name'])): ?>
-                                <div class="calendar-item-location">
-                                    <img src="<?php echo esc_url(home_url('/wp-content/uploads/2024/10/location.svg')); ?>" 
-                                        alt="" 
-                                        aria-hidden="true" 
-                                        width="21" 
-                                        height="20">
-                                    <span class="visually-hidden">Lokalizacja: </span>
-                                    <?php 
-                                    $location_url = !empty($location['address']) ? 'https://maps.google.com/?q=' . urlencode($location['address']) : '';
-                                    if (!empty($location_url)) {
-                                        echo '<a href="' . esc_url($location_url) . '" target="_blank" rel="noopener noreferrer">';
-                                        echo '<span>' . esc_html($location['name']) . '</span>';
-                                        echo '</a>';
-                                    } else {
-                                        echo '<span>' . esc_html($location['name']) . '</span>';
-                                    }
-                                    ?>
-                                </div>
-                            <?php endif; ?>
+                            <?php render_event_location($location); ?>
                             
                             
                             <?php if (!empty($accessibility_features)): ?>
