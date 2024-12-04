@@ -118,12 +118,22 @@ function get_event_banner_image($event, $banner) {
                 // var_dump($event);
                 // echo '</pre>';
 
+                // start time 
                 $start_time = (isset($event->data->time) ? $event->data->time['start'] : '');
-                // Convert start time to 24-hour format
+                // end time 
+                $end_time = (isset($event->data->time) ? $event->data->time['end'] : '');
+                // Convert time to 24-hour format
                 $start_time_24h = date('H:i', strtotime($start_time));
-                
+                // Convert time to 24-hour format 
+                $end_time_24h = date('H:i', strtotime($end_time));
+                // mec_hide_end_time
+                $mec_hide_end_time = isset($event->data->meta['mec_hide_end_time']) && $event->data->meta['mec_hide_end_time'] == '1';
+                //display time (if mec_hide_end_time is true, display only start time)
+                $display_time = $mec_hide_end_time ? $start_time_24h : $start_time_24h . ' - ' . $end_time_24h;
                 // Check for all-day event
                 $is_all_day = isset($event->data->meta['mec_allday']) && $event->data->meta['mec_allday'] == '1';
+
+                
 
                 $event_start_date = !empty($event->date['start']['date']) ? $event->date['start']['date'] : '';
                 $event_color = $this->get_event_color_dot($event, true);
@@ -224,7 +234,8 @@ function get_event_banner_image($event, $banner) {
                         <!-- Time and Ticket Link Column -->
                         <div class="column-time-and-ticket calendar-item-meta">
                             <div class="calendar-item-time">
-                            <?php echo $is_all_day ? (function_exists('pll__') ? pll__('Cały dzień') : esc_html__('all day', 'modern-events-calendar-lite')) : esc_html($start_time_24h); ?>
+                            <!-- this will have to be changed -->
+                            <?php echo $display_time; ?>
                             </div>
                             <a href="<?php echo esc_url(home_url('/bilety/?wybrane=' . $event->data->ID)); ?>" class="buy-ticket-button calendar-item-ticket">Bilety</a>
                         </div>
