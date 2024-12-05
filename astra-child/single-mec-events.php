@@ -173,16 +173,25 @@ get_header('mec'); ?>
                   
                     $display_time = get_formatted_event_time($event_mec);
 
+                  
+
 
                     // get mec_repeat_status from metadata
-                    $mec_repeat_status = get_post_meta($event_id, 'mec_repeat_status', true);
+                    $mec_repeat_status = $event_mec->data->meta['mec_repeat_status'];
                     // Get fields data from existing meta
-                    $data_occurrences = (isset($event->data) && isset($event->data->meta) && isset($event->data->meta['mec_fields']) && is_array($event->data->meta['mec_fields'])) ? $event->data->meta['mec_fields'] : get_post_meta($event_id, 'mec_fields', true);
+                    $data_occurrences = (isset($event_mec->data) && isset($event_mec->data->meta) && isset($event_mec->data->meta['mec_fields']) && is_array($event_mec->data->meta['mec_fields'])) ? $event_mec->data->meta['mec_fields'] : null;
                 
-               
+                //  debug event 
+                 echo '<pre>';
+                 var_dump($event_mec);
+                 echo '</pre>';
 
                     // Get metadata for this occurrence
                     $metadata = MEC_feature_occurrences::param($event_id, $start_timestamp, '*');
+                    // debug metadata
+                    // echo '<pre>';
+                    // var_dump($metadata);
+                    // echo '</pre>';   
                     
                     // Determine if the event is sold out
                     $is_sold_out = false;
@@ -296,6 +305,8 @@ get_header('mec'); ?>
                         echo '</a>';
                     } else if ($is_sold_out && $is_free !== 'tak') {
                         echo '<span class="uppercase">' . esc_html(pll__('wyprzedane')) . '</span>';
+                    } else if ($is_free === 'tak') {
+                        echo '<span class="free-entry">wstęp wolny</span>';
                     }
                     echo '</div>';
 
