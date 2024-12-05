@@ -21,6 +21,8 @@ function get_event_location_global($event) {
            [];
 }
 
+
+
 function render_tickets_view($events) {
     // debug events
     // print the number of events
@@ -38,34 +40,24 @@ function render_tickets_view($events) {
                     $title = $event->data->title ?? '';
                     $permalink = $event->data->permalink ?? '';
                     $excerpt = $event->data->post->post_excerpt ?? '';
-                    $accessibility_features = get_event_field_value_global($event, 7);
+                    $fields = get_robust_event_fields_values_global($event, [7, 12, 5, 17]);
+                    $accessibility_features = $fields[7];
+                    $tickets_available_value = $fields[12];
+                    $ticket_link = $fields[5];
+                    $is_event_free = $fields[17];
 
                     if (is_array($accessibility_features)) {
                         $accessibility_features = implode(', ', $accessibility_features);
                     }
                     $location = get_event_location_global($event);
-                    $tickets_available_value = get_event_field_value_global($event, 12);
                     $tickets_soldout = $tickets_available_value === 'wyprzedane' ? 'wyprzedane' : 'dostępne';
                     $sold_out_class = $tickets_soldout === 'wyprzedane' ? ' sold-out' : '';
-                    $ticket_link = get_event_field_value_global($event, 5);
-                    // debug ticket link
-                    // echo '<pre>';
-                    // var_dump($ticket_link);
-                    // echo '</pre>';
-    
-                    // is event free 
-                    $is_event_free = get_event_field_value_global($event, 17);
     
                     // Skip rendering if the event is free or tickets are available with a link
                     if ($is_event_free === 'tak' || ($tickets_soldout === 'dostępne' && empty($ticket_link))) {
                         continue;
                     }
     
-                    // ticket div button element
-                    // if event is free show "wstęp wolny" (no link)
-                    // if event is not free and tickets are not sold out show "bilety" (it should be a link to bilety page)
-                    // if event is not free and tickets are sold out show "wyprzedane" (no link)
-                    // ticket html element
                     $ticket_html = '';
                     if($is_event_free === 'tak') {
                         $ticket_html = '<span class="free-entry">wstęp wolny</span>';

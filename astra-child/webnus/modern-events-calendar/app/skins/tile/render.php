@@ -117,17 +117,8 @@ function get_event_banner_image($event, $banner) {
                 // echo '</pre>';
 
                 // start time 
-                $start_time = (isset($event->data->time) ? $event->data->time['start'] : '');
-                // end time 
-                $end_time = (isset($event->data->time) ? $event->data->time['end'] : '');
-                // Convert time to 24-hour format
-                $start_time_24h = date('H:i', strtotime($start_time));
-                // Convert time to 24-hour format 
-                $end_time_24h = date('H:i', strtotime($end_time));
-                // mec_hide_end_time
-                $mec_hide_end_time = isset($event->data->meta['mec_hide_end_time']) && $event->data->meta['mec_hide_end_time'] == '1';
-                //display time (if mec_hide_end_time is true, display only start time)
-                $display_time = $mec_hide_end_time ? $start_time_24h : $start_time_24h . ' - ' . $end_time_24h;
+               
+                $display_time = get_formatted_event_time($event);
                 // Check for all-day event
                 $is_all_day = isset($event->data->meta['mec_allday']) && $event->data->meta['mec_allday'] == '1';
 
@@ -141,8 +132,7 @@ function get_event_banner_image($event, $banner) {
                 // $tickets_available_value = get_event_field_value($event, 12);
                 // $tickets_soldout = $tickets_available_value === 'wyprzedane' ? 'wyprzedane' : 'dostępne';
                 
-               // Replace the tickets availability check with this (around line 150)
-               // Then you can use it like this:
+
                 $tickets_available_value = get_event_field_value_global($event, 12);
                 $tickets_soldout = $tickets_available_value === 'wyprzedane' ? 'wyprzedane' : 'dostępne';
                 $sold_out_class = $tickets_soldout === 'wyprzedane' ? ' sold-out' : '';

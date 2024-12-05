@@ -33,43 +33,43 @@ get_header('mec'); ?>
                 // Get event banner settings
                 $event_metadata = get_post_meta($event_id);
                 $event_banner = $event_metadata['mec_banner'];
-                // Get MEC render object
-               // Include MEC main class
-                $main = new MEC_skin_single();
+//                 // Get MEC render object
+// $render = new MEC_render();
 
-                // Get the full event data
-                $event_mec_fetched = $main->get_event_mec($event_id);
-                $event_mec = $event_mec_fetched[0];
+// // Get event data using MEC's internal methods
+// $event_data = $render->data($event_id);
 
-                // Debug the available data
-                // echo '<pre>';
-                // var_dump($event_mec);
-                // echo '</pre>';
-                
+//                 // Debug the available data
+//                 echo '<pre>';
+//                 var_dump($event_data); // or $event_detail
+//                 echo '</pre>';
 
+    // TODO:  many of get_post_meta could be optimize, same for post thumbnail and many more
 
+    // Determine which image to use
+    if (!empty($event_banner['use_featured_image']) && $event_banner['use_featured_image'] == '1') {
+        // Get featured image ID and details
+        $thumbnail_id = get_post_thumbnail_id($event_id);
+        $banner_image_src = wp_get_attachment_image_src($thumbnail_id, 'full');
+        $banner_image_alt = get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true);
+    } elseif (!empty($event_banner['image'])) {
+        // Use custom banner image provided in event settings
+        $banner_image_src = array($event_banner['image']);
+        // <!-- Debug banner_image_src: https://dev.komuna.warszawa.pl/wp-content/uploads/2024/09/Screenshot-2024-09-13-at-14.14.19.png -->
+       // Get the image ID from the URL
+    $banner_image_id = attachment_url_to_postid($event_banner['image']);
+    
+    // Retrieve the alt text using the image ID
+    $banner_image_alt = get_post_meta($banner_image_id, '_wp_attachment_image_alt', true);
+    
 
-
-                // Determine which image to use
-                if (!empty($event_banner['use_featured_image']) && $event_banner['use_featured_image'] == '1') {
-                    // Get featured image ID and details
-                    $thumbnail_id = get_post_thumbnail_id($event_id);
-                    $banner_image_src = wp_get_attachment_image_src($thumbnail_id, 'full');
-                    $banner_image_alt = get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true);
-                } elseif (!empty($event_banner['image'])) {
-                    // Use custom banner image provided in event settings
-                    $banner_image_src = array($event_banner['image']);
-                // Get the image ID from the URL
-                    $banner_image_id = attachment_url_to_postid($event_banner['image']);
-                    // Retrieve the alt text using the image ID
-                    $banner_image_alt = get_post_meta($banner_image_id, '_wp_attachment_image_alt', true);
-                } else {
-                    // Fallback if no image is provided
-                    $banner_image_src = array('');
-                    $banner_image_alt = '';
-                }
+    } else {
+        // Fallback if no image is provided
+        $banner_image_src = array('');
+        $banner_image_alt = '';
+    }
             ?>
-        <div class="custom-event-image-container-wrapper">
+             <div class="custom-event-image-container-wrapper">
        
         <div class="custom-event-image-container">
             <?php if(!empty($banner_image_src[0])): ?>
@@ -101,7 +101,7 @@ get_header('mec'); ?>
 
             <div class=" custom-box-container info-container">
                 
-                <h1 class="custom-event-title"><?php echo $event_mec->data->title; ?></h1>
+                <h1 class="custom-event-title"><?php the_title(); ?></h1>
                 <!-- post excerpt -->
                 <?php 
                 $excerpt = get_the_excerpt();
@@ -169,11 +169,6 @@ get_header('mec'); ?>
                     $start_timestamp = $date->tstart;
                     $end_timestamp = $date->tend;
 
-                    // the code below could be put in a function
-                  
-                    $display_time = get_formatted_event_time($event_mec);
-
-
                     // get mec_repeat_status from metadata
                     $mec_repeat_status = get_post_meta($event_id, 'mec_repeat_status', true);
                     // Get fields data from existing meta
@@ -207,7 +202,7 @@ get_header('mec'); ?>
                     if ($is_premiere === 'tak') {
                         echo '<span class="premiere-label">' . esc_html(pll__('premiera')) . '</span>';
                     }
-                    echo '<h3 class="occurrence-event-title' . $strike_through_class . '">' . esc_html(get_the_title()) . ' <span class="occurrence-event-date' . $strike_through_class . '">' . $display_time . '</span></h3>';
+                    echo '<h3 class="occurrence-event-title' . $strike_through_class . '">' . esc_html(get_the_title()) . ' <span class="occurrence-event-date' . $strike_through_class . '">' . date('d.m', $start_timestamp) . ', ' . date('H:i', $start_timestamp) . '</span></h3>';
                     echo '</div>';
                     
 
