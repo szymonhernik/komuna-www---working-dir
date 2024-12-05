@@ -47,7 +47,9 @@ function my_theme_enqueue_styles() {
 
 // Include custom MEC functions
 require_once get_stylesheet_directory() . '/custom-mec-functions-v2.php';
+require_once get_stylesheet_directory() . '/ticket-view-functions.php'; 
 require_once get_stylesheet_directory() . '/komuna-shortcodes.php';
+require_once get_stylesheet_directory() . '/global-functions.php';
 
 function custom_yoast_breadcrumbs($links) {
     if (is_singular('mec-events')) {
