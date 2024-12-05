@@ -182,9 +182,9 @@ get_header('mec'); ?>
                     $data_occurrences = (isset($event_mec->data) && isset($event_mec->data->meta) && isset($event_mec->data->meta['mec_fields']) && is_array($event_mec->data->meta['mec_fields'])) ? $event_mec->data->meta['mec_fields'] : null;
                 
                 //  debug event 
-                 echo '<pre>';
-                 var_dump($event_mec);
-                 echo '</pre>';
+                //  echo '<pre>';
+                //  var_dump($event_mec);
+                //  echo '</pre>';
 
                     // Get metadata for this occurrence
                     $metadata = MEC_feature_occurrences::param($event_id, $start_timestamp, '*');
