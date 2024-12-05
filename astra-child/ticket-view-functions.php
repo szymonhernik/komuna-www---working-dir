@@ -44,10 +44,42 @@ function render_tickets_view($events) {
                         $accessibility_features = implode(', ', $accessibility_features);
                     }
                     $location = get_event_location_global($event);
+                    $tickets_available_value = get_event_field_value_global($event, 12);
+                    $tickets_soldout = $tickets_available_value === 'wyprzedane' ? 'wyprzedane' : 'dostępne';
+                    $sold_out_class = $tickets_soldout === 'wyprzedane' ? ' sold-out' : '';
+                    $ticket_link = get_event_field_value_global($event, 5);
+                    // debug ticket link
+                    // echo '<pre>';
+                    // var_dump($ticket_link);
+                    // echo '</pre>';
+    
+                    // is event free 
+                    $is_event_free = get_event_field_value_global($event, 17);
+    
+                    // Skip rendering if the event is free or tickets are available with a link
+                    if ($is_event_free === 'tak' || ($tickets_soldout === 'dostępne' && empty($ticket_link))) {
+                        continue;
+                    }
+    
+                    // ticket div button element
+                    // if event is free show "wstęp wolny" (no link)
+                    // if event is not free and tickets are not sold out show "bilety" (it should be a link to bilety page)
+                    // if event is not free and tickets are sold out show "wyprzedane" (no link)
+                    // ticket html element
+                    $ticket_html = '';
+                    if($is_event_free === 'tak') {
+                        $ticket_html = '<span class="free-entry">wstęp wolny</span>';
+                    }
+                    else if($tickets_soldout === 'dostępne' && !empty($ticket_link)) {
+                        $ticket_html = '<a href="' . $ticket_link . '" class="buy-ticket-button calendar-item-ticket">bilety</a>';
+                    }
+                    else if($tickets_soldout === 'wyprzedane') {
+                        $ticket_html = '<span class="sold-out">wyprzedane</span>';
+                    } 
                     
                 ?>
                 <div class="bilety-item">
-                    <div class="event-content">
+                    <div class="event-content <?php echo $sold_out_class; ?>">
                         <span class="event-time"><?php echo $formattedDate; ?>, <?php echo $timeOfEvent; ?></span>
                         <h4 class="event-title">
                             <a href="<?php echo esc_url($permalink); ?>"><?php echo esc_html($title); ?></a>
@@ -65,7 +97,7 @@ function render_tickets_view($events) {
                        <?php endif; ?>
                     </div>
                     <div class="bilety-footer">
-                        Bileciki
+                        <?php echo $ticket_html; ?>
                     </div>
                 </div>
             <?php endforeach; ?>
