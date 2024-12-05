@@ -147,8 +147,8 @@ get_header('mec'); ?>
 
                     // get mec_repeat_status from metadata
                     $mec_repeat_status = get_post_meta($event_id, 'mec_repeat_status', true);
-                // Get fields data from existing meta
-                $data_occurrences = (isset($event->data) && isset($event->data->meta) && isset($event->data->meta['mec_fields']) && is_array($event->data->meta['mec_fields'])) ? $event->data->meta['mec_fields'] : get_post_meta($event_id, 'mec_fields', true);
+                    // Get fields data from existing meta
+                    $data_occurrences = (isset($event->data) && isset($event->data->meta) && isset($event->data->meta['mec_fields']) && is_array($event->data->meta['mec_fields'])) ? $event->data->meta['mec_fields'] : get_post_meta($event_id, 'mec_fields', true);
                 
                
 

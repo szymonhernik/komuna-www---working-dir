@@ -12,22 +12,22 @@ $display_label = isset($this->skin_options['display_label']) ? $this->skin_optio
 $reason_for_cancellation = isset($this->skin_options['reason_for_cancellation']) ? $this->skin_options['reason_for_cancellation'] : false;
 
 $method = isset($this->skin_options['sed_method']) ? $this->skin_options['sed_method'] : false;
-$map_events = [];
+$mapEvents = [];
 
-function get_event_field_value_global($event, $field_number) {
-    global $map_events;
+function get_event_field_value_global($event, $fieldNumber) {
+    global $mapEvents;
     
     // Store the first occurrence of each event ID
-    if (!isset($map_events[$event->data->ID])) {
-        $map_events[$event->data->ID] = $event;
+    if (!isset($mapEvents[$event->data->ID])) {
+        $mapEvents[$event->data->ID] = $event;
     }
     
-    $first_occurrence = $map_events[$event->data->ID];
+    $firstOccurrence = $mapEvents[$event->data->ID];
     
     // Check for edited occurrences for the current event's specific date
-    $current_date = $event->date['start']['date'];
-    return $first_occurrence->data->edited_occurrences[$current_date]['fields'][$field_number] ?? 
-           $first_occurrence->data->meta['mec_fields'][$field_number] ?? 
+    $currentDate = $event->date['start']['date'];
+    return $firstOccurrence->data->editedOccurrences[$currentDate]['fields'][$fieldNumber] ?? 
+           $firstOccurrence->data->meta['mec_fields'][$fieldNumber] ?? 
            '';
 }
 
@@ -72,8 +72,9 @@ function render_event_location($location) {
                 echo '<a href="' . esc_url($locationUrl) . '" target="_blank" rel="noopener noreferrer">';
                 echo '<span>' . esc_html($location['name']) . '</span>';
                 echo '</a>';
-            } 
-            echo '<span>' . esc_html($location['name']) . '</span>';
+            } else {
+                echo '<span>' . esc_html($location['name']) . '</span>';
+            }
             
             ?>
         </div>
@@ -156,7 +157,8 @@ function get_event_banner_image($event, $banner) {
 
                 $event_start_date = !empty($event->date['start']['date']) ? $event->date['start']['date'] : '';
                 $background_image = (isset($event->data->featured_image['tileview']) && trim($event->data->featured_image['tileview'])) ? ' url(\''.trim($event->data->featured_image['tileview']).'\')' : '';
-                
+
+
                 
                 // get the tickets value from fields[12]
                 // $tickets_available_value = get_event_field_value($event, 12);
@@ -166,6 +168,7 @@ function get_event_banner_image($event, $banner) {
                // Then you can use it like this:
                 $tickets_available_value = get_event_field_value_global($event, 12);
                 $tickets_soldout = $tickets_available_value === 'wyprzedane' ? 'wyprzedane' : 'dostępne';
+                $sold_out_class = $tickets_soldout === 'wyprzedane' ? ' sold-out' : '';
 
                 // is event free 
                 $is_event_free = get_event_field_value_global($event, 17);
@@ -254,7 +257,7 @@ function get_event_banner_image($event, $banner) {
                             <!-- Image Column -->
                             <?php render_event_image($event, get_event_banner_image($event, $banner), $width, $height); ?>
                             <!-- Title, Description, and Accessibility Column -->
-                            <div class=" calendar-item-details">
+                            <div class="calendar-item-details <?php echo $sold_out_class; ?>">
                             <?php if ($premiere_status !== null && $premiere_status === 'tak') {
                                 // Show premiere badge or handle premiere status
                                 echo '<div class="premiere-badge">Premiera</div>';
@@ -285,7 +288,7 @@ function get_event_banner_image($event, $banner) {
                             </div>
                         </div>
                         <!-- Time and Ticket Link Column -->
-                        <div class="column-time-and-ticket calendar-item-meta">
+                        <div class="column-time-and-ticket calendar-item-meta  <?php echo $sold_out_class; ?>">
                             <div class="calendar-item-time">
                             <!-- this will have to be changed -->
                             <?php echo $display_time; ?>
