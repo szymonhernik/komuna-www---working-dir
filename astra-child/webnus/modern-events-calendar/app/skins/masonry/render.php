@@ -10,10 +10,43 @@ $settings = $this->main->get_settings();
 $this->localtime = isset($this->skin_options['include_local_time']) ? $this->skin_options['include_local_time'] : false;
 $display_label = isset($this->skin_options['display_label']) ? $this->skin_options['display_label'] : false;
 $reason_for_cancellation = isset($this->skin_options['reason_for_cancellation']) ? $this->skin_options['reason_for_cancellation'] : false;
+
+// Add this function near the top of the file, after the initial variable declarations
+function get_last_future_date($event, $event_start_date) {
+    if ($event->data->meta['mec_repeat_status'] != 1) {
+        return '';
+    }
+
+    $days = $event->data->mec->days;
+    $start_date = $event->data->mec->start;
+    $end_date = $event->data->mec->end;
+
+    if (!empty($days)) {
+        $dates = array_map(
+            function($date_entry) {
+                return substr($date_entry, 0, strpos($date_entry, ':'));
+            },
+            explode(',', $days)
+        );
+        
+        sort($dates);
+        $last_date = end($dates);
+        
+        return ($last_date !== $event_start_date) ? $last_date : '';
+    }
+    
+    return ($start_date !== $end_date && $end_date !== $event_start_date) ? $end_date : '';
+}
+
+// dubug events:
+// echo '<pre>';
+// print_r($this->events);
+// echo '</pre>';
 ?>
 
 <div class="mec-wrap custom-mec-container">
     <div class="custom-grid-layout" role="region"> 
+
         <?php
         foreach($this->events as $date):
         foreach($date as $event):
@@ -24,6 +57,9 @@ $reason_for_cancellation = isset($this->skin_options['reason_for_cancellation'])
             $event_color = $this->get_event_color_dot($event);
             $event_start_date = !empty($event->date['start']['date']) ? $event->date['start']['date'] : '';
             $event_title = get_the_title($event->data->ID);
+            $mec_repeat_status = $event->data->meta['mec_repeat_status'];
+
+            $last_future_date = get_last_future_date($event, $event_start_date);
 
             // MEC Schema
             do_action('mec_schema', $event);
@@ -53,7 +89,11 @@ $reason_for_cancellation = isset($this->skin_options['reason_for_cancellation'])
                     </div>
                     <div class="custom-grid-item-description">
                         <div class="custom-mec-event-date" id="event-date-<?php echo esc_attr($event->data->ID); ?>">
-                            <?php echo esc_html($this->main->date_i18n($this->date_format_1, strtotime($event->date['start']['date']))); ?>
+                            <?php echo esc_html($this->main->date_i18n($this->date_format_1, strtotime($event->date['start']['date']))); ?> 
+                            <!-- if last_future_date not empty, show it -->
+                            <?php if (!empty($last_future_date)): ?>
+                               - <?php echo esc_html($this->main->date_i18n($this->date_format_1, strtotime($last_future_date))); ?>
+                            <?php endif; ?>
                         </div>
                         <div class="custom-mec-event-labels">
                             <?php echo MEC_kses::element($this->main->get_normal_labels($event, $display_label).$this->main->display_cancellation_reason($event, $reason_for_cancellation)); ?>
@@ -67,6 +107,22 @@ $reason_for_cancellation = isset($this->skin_options['reason_for_cancellation'])
                         <div class="custom-mec-event-excerpt">
                             <div><?php echo MEC_kses::element(get_the_excerpt($event->data->post)); ?></div>
                         </div>
+                        <?php if(isset($location['name']) and trim($location['name'])): ?>
+                                <div class="mec-masonry-col6">
+                                    <div class="mec-event-location">
+                                    <img src="<?php echo esc_url(home_url('/wp-content/uploads/2024/10/location.svg')); ?>" 
+                alt="" 
+                aria-hidden="true" 
+                width="21" 
+                height="20">
+                                        <div class="mec-event-location-det">
+                                            <span class="mec-location-name"><?php echo esc_html($location['name']); ?></span>
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+                       
                     </div>
                 </div>
             </a>

@@ -70,5 +70,5 @@ function get_formatted_event_time($event_mec) {
     $end_time_24h = date('H:i', strtotime($end_time));
     $mec_hide_end_time = isset($event_mec->data->meta['mec_hide_end_time']) && $event_mec->data->meta['mec_hide_end_time'] == '1';
     
-    return $mec_hide_end_time ? $start_time_24h : $start_time_24h . ' - ' . $end_time_24h;
+    return $mec_hide_end_time ? $start_time_24h : $start_time_24h . '-' . $end_time_24h;
 }

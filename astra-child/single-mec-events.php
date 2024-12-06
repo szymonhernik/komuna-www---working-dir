@@ -209,6 +209,7 @@ get_header('mec'); ?>
                     $is_sold_out = ($tickets_availability == 'wyprzedane') && $is_free !== 'tak';
                     $sold_out_class = $is_sold_out  ? ' sold-out' : '';
                     $strike_through_class = $is_sold_out ? ' sold-out--strike' : '';
+                    $event_date = date('d.m.Y', $start_timestamp);
 
                     echo '<li class="occurrence-event-item">';
                     echo '<div class="occurrence-event-details' . $sold_out_class . '">';
@@ -216,7 +217,7 @@ get_header('mec'); ?>
                     if ($is_premiere === 'tak') {
                         echo '<span class="premiere-label">' . esc_html(pll__('premiera')) . '</span>';
                     }
-                    echo '<h3 class="occurrence-event-title' . $strike_through_class . '">' . esc_html(get_the_title()) . ' <span class="occurrence-event-date' . $strike_through_class . '">' . $display_time . '</span></h3>';
+                    echo '<h3 class="occurrence-event-title' . $strike_through_class . '">' . esc_html(get_the_title()) . ' <span class="occurrence-event-date' . $strike_through_class . '">' . $event_date . ', ' . $display_time . '</span></h3>';
                     echo '</div>';
                     
 
