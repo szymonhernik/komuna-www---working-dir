@@ -93,6 +93,12 @@ function custom_yoast_breadcrumbs($links) {
 }
 add_filter('wpseo_breadcrumb_links', 'custom_yoast_breadcrumbs');
 
+function child_pages_query_callback( $query ) {
+    global $post;
+    $query->set( 'post_parent', $post->ID );
+}
+add_action( 'elementor/query/child_pages', 'child_pages_query_callback' );
+
 
 
 ?>
