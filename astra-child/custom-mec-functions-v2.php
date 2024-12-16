@@ -303,6 +303,10 @@ add_shortcode('custom_mec_shortcode_2870', function() {
     return custom_mec_archival_output(2870);
 });
 
+add_shortcode('custom_mec_shortcode_12699', function() {
+    return custom_mec_archival_output(12699);
+});
+
 add_shortcode('custom_mec_shortcode_2742', function() {
     return custom_mec_archival_output(2742);
 });

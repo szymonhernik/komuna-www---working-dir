@@ -40,11 +40,12 @@ function render_tickets_view($events) {
                     $title = $event->data->title ?? '';
                     $permalink = $event->data->permalink ?? '';
                     $excerpt = $event->data->post->post_excerpt ?? '';
-                    $fields = get_robust_event_fields_values_global($event, [7, 12, 5, 17]);
+                    $fields = get_robust_event_fields_values_global($event, [7, 12, 5, 17, 14]);
                     $accessibility_features = $fields[7];
                     $tickets_available_value = $fields[12];
                     $ticket_link = $fields[5];
                     $is_event_free = $fields[17];
+                    $ticket_price_info = $fields[14];
 
                     if (is_array($accessibility_features)) {
                         $accessibility_features = implode(', ', $accessibility_features);
@@ -80,6 +81,11 @@ function render_tickets_view($events) {
                         <?php if (!empty($excerpt)): ?>
                             <div class="event-excerpt"><?php echo wp_kses_post($excerpt); ?></div>
                         <?php endif; ?>
+
+                        <?php if (!empty($ticket_price_info)): ?>
+                            <div class="event-item-ticket-price-info"><?php pll_e('Cena: '); ?> <?php echo esc_html($ticket_price_info); ?></div>
+                        <?php endif; ?>
+
                         <?php if (!empty($accessibility_features)): ?>
                                 <div class=" event-item-accessibility">+ <?php echo esc_html($accessibility_features); ?></div>
                         <?php endif; ?>

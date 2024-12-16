@@ -36,6 +36,7 @@ function my_theme_enqueue_styles() {
             pll_register_string('free', 'darmowe', 'astra-child');
             pll_register_string('choose-date', 'Wybierz datę', 'astra-child');
             pll_register_string('all-day', 'Cały dzień', 'astra-child');
+            pll_register_string('price', 'Cena: ', 'astra-child');
         }
     }
     add_action('init', 'register_my_strings');
@@ -73,13 +74,35 @@ function custom_yoast_breadcrumbs($links) {
                 );
             }
 
-            // Use the same language path for category
-            $category_page = get_page_by_path($program_path . '/' . $category->slug);
-            if ($category_page) {
+            // First, modify the category slug for archive categories
+            if ($category->slug === 'teatr-taniec-archiwum' || $category->slug === 'theatre-dance-archive') {
+                // Convert archive category to main category
+                $main_category_slug = (pll_current_language() === 'en') ? 'theatre-dance' : 'teatr-taniec';
+                
+                // Get the page for the main category
+                $category_page = get_page_by_path($program_path . '/' . $main_category_slug);
+                if ($category_page) {
+                    $links[] = array(
+                        'url' => get_permalink($category_page->ID),
+                        'text' => get_the_title($category_page->ID)
+                    );
+                }
+
+                // Add the archive section to breadcrumbs
+                $archive_text = (pll_current_language() === 'en') ? 'Archival Performances' : 'Spektakle Archiwalne';
                 $links[] = array(
-                    'url' => get_permalink($category_page->ID),
-                    'text' => get_the_title($category_page->ID)
+                    'url' => get_permalink($category_page->ID) . 'spektakle-archiwalne/',
+                    'text' => $archive_text
                 );
+            } else {
+                // Handle non-archive categories normally
+                $category_page = get_page_by_path($program_path . '/' . $category->slug);
+                if ($category_page) {
+                    $links[] = array(
+                        'url' => get_permalink($category_page->ID),
+                        'text' => get_the_title($category_page->ID)
+                    );
+                }
             }
 
             // Add current event
