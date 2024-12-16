@@ -37,6 +37,7 @@ function my_theme_enqueue_styles() {
             pll_register_string('choose-date', 'Wybierz datę', 'astra-child');
             pll_register_string('all-day', 'Cały dzień', 'astra-child');
             pll_register_string('price', 'Cena: ', 'astra-child');
+            pll_register_string('free-entry', 'wstęp wolny', 'astra-child');
         }
     }
     add_action('init', 'register_my_strings');
