@@ -61,13 +61,32 @@ function render_tickets_view($events) {
     
                     $ticket_html = '';
                     if($is_event_free === 'tak') {
-                        $ticket_html = '<span class="free-entry">wstęp wolny</span>';
+                        $ticket_html = '<span class="free-entry">' . esc_html(pll__('wstęp wolny')) . '</span>';
                     }
                     else if($tickets_soldout === 'dostępne' && !empty($ticket_link)) {
-                        $ticket_html = '<a href="' . $ticket_link . '" class="buy-ticket-button calendar-item-ticket">bilety</a>';
+                        $ticket_html = '<a href="' . $ticket_link . '" class="buy-ticket-button calendar-item-ticket" target="_blank" rel="noopener noreferrer" aria-label="' . esc_attr(pll__('Kup bilet')) . ' ' . esc_attr($title) . ' ' . esc_attr($formattedDate) . '">';
+                        $ticket_html .= esc_html(pll__('Kup bilet'));
+                        $ticket_html .= '<div class="svg-container">';
+                        $ticket_html .= '<div class="svg-one">';
+                        $ticket_html .= '<div class="svg-wrapper">';
+                        ob_start();
+                        include(get_stylesheet_directory() . '/assets/images/bilet.svg');
+                        $ticket_html .= ob_get_clean();
+                        $ticket_html .= '</div>';
+                        $ticket_html .= '</div>';
+                        
+                        $ticket_html .= '<div class="svg-two">';
+                        $ticket_html .= '<div class="svg-wrapper">';
+                        ob_start();
+                        include(get_stylesheet_directory() . '/assets/images/bilet.svg');
+                        $ticket_html .= ob_get_clean();
+                        $ticket_html .= '</div>';
+                        $ticket_html .= '</div>';
+                        $ticket_html .= '</div>';
+                        $ticket_html .= '</a>';
                     }
                     else if($tickets_soldout === 'wyprzedane') {
-                        $ticket_html = '<span class="sold-out">wyprzedane</span>';
+                        $ticket_html = '<span class="sold-out">' . esc_html(pll__('wyprzedane')) . '</span>';
                     } 
                     
                 ?>
