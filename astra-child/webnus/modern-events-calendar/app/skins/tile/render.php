@@ -127,7 +127,6 @@ function get_event_banner_image($event, $banner) {
                 $event_start_date = !empty($event->date['start']['date']) ? $event->date['start']['date'] : '';
                 $background_image = (isset($event->data->featured_image['tileview']) && trim($event->data->featured_image['tileview'])) ? ' url(\''.trim($event->data->featured_image['tileview']).'\')' : '';
                 
-                
                 // get the tickets value from fields[12]
                 // $tickets_available_value = get_event_field_value($event, 12);
                 // $tickets_soldout = $tickets_available_value === 'wyprzedane' ? 'wyprzedane' : 'dostępne';
@@ -139,6 +138,9 @@ function get_event_banner_image($event, $banner) {
 
                 // is event free 
                 $is_event_free = get_event_field_value_global($event, 17);
+                // ticket's link 
+                $ticket_link = get_event_field_value_global($event, 5);
+
 
                 // ticket div button element
                 // if event is free show "wstęp wolny" (no link)
@@ -146,14 +148,19 @@ function get_event_banner_image($event, $banner) {
                 // if event is not free and tickets are sold out show "wyprzedane" (no link)
                 // ticket html element
                 $ticket_html = '';
-                if($is_event_free === 'tak') {
-                    $ticket_html = '<span class="free-entry">wstęp wolny</span>';
-                }
-                else if($tickets_soldout === 'dostępne') {
-                    $ticket_html = '<a href="' . esc_url(home_url('/bilety')) . '" class="buy-ticket-button calendar-item-ticket">bilety</a>';
-                }
-                else if($tickets_soldout === 'wyprzedane') {
-                    $ticket_html = '<span class="sold-out">wyprzedane</span>';
+                // Check if event is in the past
+                $event_date = strtotime($event->date['start']['date']);
+                $today = strtotime('today');
+                if ($event_date >= $today) {  // Only show ticket info for current and future events
+                    if($is_event_free === 'tak') {
+                        $ticket_html = '<span class="free-entry">wstęp wolny</span>';
+                    }
+                    else if($tickets_soldout === 'dostępne' && !empty($ticket_link)) {
+                        $ticket_html = '<a href="' . esc_url(home_url('/bilety')) . '" class="buy-ticket-button calendar-item-ticket">' . esc_html(pll__('bilety')) . '</a>';
+                    }
+                    else if($tickets_soldout === 'wyprzedane') {
+                        $ticket_html = '<span class="sold-out">wyprzedane</span>';
+                    }
                 }
                 
                 
@@ -262,6 +269,7 @@ function get_event_banner_image($event, $banner) {
                             </div>
                             <?php echo $ticket_html; ?>
                         </div>
+
                     </article>
                
             <?php
