@@ -115,25 +115,22 @@ get_header('mec'); ?>
           
             <div class="custom-box-container extra-info-container">
                 <?php
-                // get start date from metadata
-                // $start_date = get_post_meta(get_the_ID(), 'mec_start_date', true);
-                $start_date = $event_mec->data->meta['mec_start_date'];
+                $start_date = get_post_meta(get_the_ID(), 'mec_start_date', true);
             
-                // get is_free from metadata
-                $is_free = $event_mec->data->meta['mec_fields_17'];
-                // $is_free = get_post_meta(get_the_ID(), 'mec_fields_17', true);
+                
+                $is_free = get_post_meta(get_the_ID(), 'mec_fields_17', true);
 
                 echo '<div class="event-custom-fields">';
-                    $duration = $event_mec->data->meta['mec_fields_9'];
+                    $duration = get_post_meta(get_the_ID(), 'mec_fields_9', true);
                     if (!empty($duration)) {
                         echo '<p class="event-duration">' . esc_html(pll__('Czas trwania')) . ': ' . esc_html($duration) . '</p>';
                     }
-                    $ticketsInfo = $event_mec->data->meta['mec_fields_14'];
+                    $ticketsInfo = get_post_meta(get_the_ID(), 'mec_fields_14', true);
                     if (!empty($ticketsInfo)) {
                         echo '<p class="event-tickets-info">' . esc_html(pll__('Bilety')) . ': ' . esc_html($ticketsInfo) . '</p>';
                     }
                     
-                    $triggerWarning = $event_mec->data->meta['mec_fields_13'];
+                    $triggerWarning = get_post_meta(get_the_ID(), 'mec_fields_13', true);
                     if (!empty($triggerWarning)) {
                         echo '<p class="event-trigger-warning">' . esc_html(pll__('Ważne')) . ': ' . esc_html($triggerWarning) . '</p>';
                     }
@@ -152,7 +149,7 @@ get_header('mec'); ?>
             // Call the get_dates() function
             $dates = $occurrences->get_dates($event_id, $current_timestamp);
             // echo '<pre>';
-            // var_dump($dates);
+            // var_dump(get_post($event_id));
             // echo '</pre>';
 
             // Display the list of occurrences
@@ -161,12 +158,18 @@ get_header('mec'); ?>
                 // echo '<h2 class="event-occurrences-title">' . esc_html(pll__('Planowane wydarzenia')) . '</h2>';             
                 echo '<ul class="event-occurrences-list">';
                 foreach ($dates as $date) {
-         
+                    // debug get_post_meta
+                    // echo '<pre>';
+                    // var_dump(get_post_meta($event_id));
+                    // echo '</pre>';
+
+                    // get mec_hide_end_time from metadata
                     
                     
                     $start_timestamp = $date->tstart;
                     $end_timestamp = $date->tend;
 
+                    // the code below could be put in a function
                   
                     $display_time = get_formatted_event_time($event_mec);
 
@@ -178,17 +181,22 @@ get_header('mec'); ?>
                     // Get fields data from existing meta
                     $data_occurrences = (isset($event_mec->data) && isset($event_mec->data->meta) && isset($event_mec->data->meta['mec_fields']) && is_array($event_mec->data->meta['mec_fields'])) ? $event_mec->data->meta['mec_fields'] : null;
                 
-    
+                //  debug event 
+                //  echo '<pre>';
+                //  var_dump($event_mec);
+                //  echo '</pre>';
 
                     // Get metadata for this occurrence
                     $metadata = MEC_feature_occurrences::param($event_id, $start_timestamp, '*');
-     
+                    // debug metadata
+                    // echo '<pre>';
+                    // var_dump($metadata);
+                    // echo '</pre>';   
                     
                     // Determine if the event is sold out
                     $is_sold_out = false;
                     if ($mec_repeat_status == 0) {
-                        // $tickets_availability = get_post_meta($event_id, 'mec_fields_12', true);
-                        $tickets_availability = isset($data_occurrences[12]) ? $data_occurrences[12] : '';
+                        $tickets_availability = get_post_meta($event_id, 'mec_fields_12', true);
                         $is_premiere = isset($data_occurrences[16]) ? $data_occurrences[16] : '';
 
                     } else if ($mec_repeat_status == 1) {
@@ -215,12 +223,11 @@ get_header('mec'); ?>
 
                     // if the mec repeat status is 0 (from meta_data) then display the ticket link from post's metadata
                     if ($mec_repeat_status == 0) {
-                        // $ticket_link = get_post_meta($event_id, 'mec_fields_5', true);
-                        $ticket_link = $event_mec->data->meta['mec_fields_5'];
-                        // $location_id = get_post_meta($event_id, 'mec_location_id', true);
-                        $location_id = $event_mec->data->meta['mec_location_id'];
-                        // $accessibility_features = get_post_meta($event_id, 'mec_fields_7', true);
-                        $accessibility_features = $event_mec->data->meta['mec_fields_7'];
+                        $ticket_link = get_post_meta($event_id, 'mec_fields_5', true);
+
+                        $location_id = get_post_meta($event_id, 'mec_location_id', true);
+
+                        $accessibility_features = get_post_meta($event_id, 'mec_fields_7', true);
                     } else if ($mec_repeat_status == 1) {
                         $ticket_link = isset($metadata['fields'][5]) ? $metadata['fields'][5] : null;
 
