@@ -33,18 +33,21 @@ $map_events = [];
 
 
 // New helper functions at the top of the file
-function group_events_by_date($events) {
-    $groupedEvents = array();
-    foreach($events as $date => $events) {
-        $dateTimestamp = strtotime($date);
-        $formattedDate = date_i18n('d.m', $dateTimestamp);
-        $dayOfWeek = date_i18n('l', $dateTimestamp);
-        $formattedDateWithDay = $formattedDate . ' <span class="mec-day-name">' . $dayOfWeek . '</span>';
-        $groupedEvents[$formattedDateWithDay] = $events;
+if ( ! function_exists( 'group_events_by_date' ) ) {
+    function group_events_by_date($events) {
+        $groupedEvents = array();
+        foreach($events as $date => $events) {
+            $dateTimestamp = strtotime($date);
+            $formattedDate = date_i18n('d.m', $dateTimestamp);
+            $dayOfWeek = date_i18n('l', $dateTimestamp);
+            $formattedDateWithDay = $formattedDate . ' <span class="mec-day-name">' . $dayOfWeek . '</span>';
+            $groupedEvents[$formattedDateWithDay] = $events;
+        }
+        return $groupedEvents;
     }
-    return $groupedEvents;
 }
 
+if ( ! function_exists( 'render_event_image' ) ) {
 function render_event_image($event, $image, $width = '', $height = '') {
     if(isset($event->data->featured_image['tileview']) && trim($event->data->featured_image['tileview'])): ?>
         <div class="calendar-item-image">
@@ -56,9 +59,11 @@ function render_event_image($event, $image, $width = '', $height = '') {
         </div>
     <?php endif;
 }
+}
 
 
 
+if ( ! function_exists( 'get_event_banner_image' ) ) {
 function get_event_banner_image($event, $banner) {
     $image = $banner['image'] ?? '';
     $featuredImage = $banner['use_featured_image'] ?? 0;
@@ -77,7 +82,8 @@ function get_event_banner_image($event, $banner) {
         }
     }
     
-    return $image;
+        return $image;
+    }
 }
 
 // Main render code

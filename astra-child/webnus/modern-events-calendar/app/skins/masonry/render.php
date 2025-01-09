@@ -11,32 +11,34 @@ $this->localtime = isset($this->skin_options['include_local_time']) ? $this->ski
 $display_label = isset($this->skin_options['display_label']) ? $this->skin_options['display_label'] : false;
 $reason_for_cancellation = isset($this->skin_options['reason_for_cancellation']) ? $this->skin_options['reason_for_cancellation'] : false;
 
-// Add this function near the top of the file, after the initial variable declarations
-function get_last_future_date($event, $event_start_date) {
-    if ($event->data->meta['mec_repeat_status'] != 1) {
-        return '';
-    }
+if ( ! function_exists( 'custom_get_last_future_date' ) ) {
+    function custom_get_last_future_date($event, $event_start_date) {
+        if ($event->data->meta['mec_repeat_status'] != 1) {
+            return '';
+        }
 
-    $days = $event->data->mec->days;
-    $start_date = $event->data->mec->start;
-    $end_date = $event->data->mec->end;
+        $days = $event->data->mec->days;
+        $start_date = $event->data->mec->start;
+        $end_date = $event->data->mec->end;
 
-    if (!empty($days)) {
-        $dates = array_map(
-            function($date_entry) {
-                return substr($date_entry, 0, strpos($date_entry, ':'));
-            },
-            explode(',', $days)
-        );
-        
-        sort($dates);
-        $last_date = end($dates);
-        
-        return ($last_date !== $event_start_date) ? $last_date : '';
+        if (!empty($days)) {
+            $dates = array_map(
+                function($date_entry) {
+                    return substr($date_entry, 0, strpos($date_entry, ':'));
+                },
+                explode(',', $days)
+            );
+
+            sort($dates);
+            $last_date = end($dates);
+
+            return ($last_date !== $event_start_date) ? $last_date : '';
+        }
+
+        return ($start_date !== $end_date && $end_date !== $event_start_date) ? $end_date : '';
     }
-    
-    return ($start_date !== $end_date && $end_date !== $event_start_date) ? $end_date : '';
 }
+
 
 // dubug events:
 // echo '<pre>';
@@ -59,7 +61,7 @@ function get_last_future_date($event, $event_start_date) {
             $event_title = get_the_title($event->data->ID);
             $mec_repeat_status = $event->data->meta['mec_repeat_status'];
 
-            $last_future_date = get_last_future_date($event, $event_start_date);
+            $last_future_date = custom_get_last_future_date($event, $event_start_date);
 
             // MEC Schema
             do_action('mec_schema', $event);

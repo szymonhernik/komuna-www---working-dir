@@ -120,8 +120,8 @@ get_header('mec'); ?>
                 $start_date = $event_mec->data->meta['mec_start_date'];
             
                 // get is_free from metadata
-                $is_free = $event_mec->data->meta['mec_fields_17'];
-                // $is_free = get_post_meta(get_the_ID(), 'mec_fields_17', true);
+                // $is_free = $event_mec->data->meta['mec_fields_17'];
+                $is_free = get_post_meta(get_the_ID(), 'mec_fields_17', true);
 
                 echo '<div class="event-custom-fields">';
                     $duration = $event_mec->data->meta['mec_fields_9'];
