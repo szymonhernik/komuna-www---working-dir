@@ -153,7 +153,8 @@ function custom_mec_archival_output($shortcode_id) {
                 // Extract event details
                 $event_excerpt = isset($event->data->post->post_excerpt) ? esc_html($event->data->post->post_excerpt) : '';
                 $event_title = isset($event->data->title) ? esc_html($event->data->title) : '';
-                $event_permalink = isset($event->data->post->guid) ? esc_url($event->data->post->guid) : '';
+                // $event_permalink = isset($event->data->post->guid) ? esc_url($event->data->post->guid) : '';
+                $event_permalink = isset($event->data->ID) ? get_permalink($event->data->ID) : '';
                 $event_start_date = isset($event->data->meta['mec_start_date']) ? esc_html($event->data->meta['mec_start_date']) : '';
                 // event end date
                 $event_end_date = isset($event->data->meta['mec_end_date']) ? esc_html($event->data->meta['mec_end_date']) : '';
