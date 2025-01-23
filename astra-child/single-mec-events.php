@@ -30,9 +30,16 @@ get_header('mec'); ?>
                 // Get the event ID
                 $event_id = get_the_ID();
 
-                // Get event banner settings
+                // Get event banner settings and unserialize the data properly
                 $event_metadata = get_post_meta($event_id);
-                $event_banner = $event_metadata['mec_banner'];
+                $event_banner_serialized = isset($event_metadata['mec_banner'][0]) ? $event_metadata['mec_banner'][0] : '';
+                $event_banner = maybe_unserialize($event_banner_serialized);
+
+                // If event_banner is still an array with index 0, get that value and unserialize it
+                if (is_array($event_banner) && isset($event_banner[0])) {
+                    $event_banner = maybe_unserialize($event_banner[0]);
+                }
+
                 // Get MEC render object
                // Include MEC main class
                 $main = new MEC_skin_single();
@@ -40,13 +47,6 @@ get_header('mec'); ?>
                 // Get the full event data
                 $event_mec_fetched = $main->get_event_mec($event_id);
                 $event_mec = $event_mec_fetched[0];
-
-                // Debug the available data
-                // echo '<pre>';
-                // var_dump($event_mec);
-                // echo '</pre>';
-                
-
 
 
 
@@ -59,9 +59,7 @@ get_header('mec'); ?>
                 } elseif (!empty($event_banner['image'])) {
                     // Use custom banner image provided in event settings
                     $banner_image_src = array($event_banner['image']);
-                // Get the image ID from the URL
                     $banner_image_id = attachment_url_to_postid($event_banner['image']);
-                    // Retrieve the alt text using the image ID
                     $banner_image_alt = get_post_meta($banner_image_id, '_wp_attachment_image_alt', true);
                 } else {
                     // Fallback if no image is provided
